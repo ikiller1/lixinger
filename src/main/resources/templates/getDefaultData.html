@@ -1,14 +1,28 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-    <link href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet">
-    <title>Title</title>
+<meta charset="UTF-8">
+<script
+	src="https://cdn.bootcss.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<link
+	href="https://cdn.bootcss.com/bootstrap/4.1.1/css/bootstrap.min.css"
+	rel="stylesheet">
+<title>Title</title>
 </head>
 <body>
-    <h1>testThymeleaf</h1>
-    <h1 th:text="${user}">Hello, Spring Boot!</h1>
-    <p th:each="item : ${items}" th:text="${item.stockCnName}"></p>
+	<h1>testThymeleaf</h1>
+	<h1 th:text="${user}">Hello, Spring Boot!</h1>
+	<table class="table table-bordered text-center">
+		<tr>
+			<th>Name</th>
+			<th>Date</th>
+			<th>PE_TTM</th>
+		</tr>
+		<tr th:each="item : ${items}">
+			<td th:text="${item.stockCnName}"></td>
+			<td th:text="${item.date}"></td>
+			<td th:text="${item.pe_ttm.weightedAvg}"></td>
+		</tr>
+	</table>
 </body>
 </html>
