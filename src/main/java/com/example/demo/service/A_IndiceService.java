@@ -3,10 +3,8 @@
  */
 package com.example.demo.service;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import com.example.demo.bean.Metrics;
 import com.example.demo.bean.RequestParam;
 import com.example.demo.util.HttpHelper;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -52,10 +48,7 @@ public class A_IndiceService {
 
 		String map = mapper.writeValueAsString(param);
 		log.debug(map);
-		Map<String, Object> paramMap = mapper.readValue(map, new TypeReference<Map<String, Object>>() {
-		});
-		log.debug(paramMap.toString());
-		String result = HttpHelper.doPost(url, paramMap);
+		String result = HttpHelper.doPost(url, null, map);
 		log.debug("result:" + result);
 		return result;
 

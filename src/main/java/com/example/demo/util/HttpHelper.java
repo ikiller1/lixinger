@@ -4,7 +4,6 @@
 package com.example.demo.util;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,6 +19,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class HttpHelper {
-	
+
 	private static final Logger log = LoggerFactory.getLogger(HttpHelper.class);
 
 	public static String doGet(String url) {
@@ -83,8 +83,8 @@ public class HttpHelper {
 		return result;
 	}
 
-	public static String doPost(String url, Map<String, Object> paramMap) {
-		log.debug("doPost: {},{}", url, paramMap.toString());
+	public static String doPost(String url, Map<String, Object> paramMap, String paramJson) throws Exception {
+		log.debug("doPost: {},{}", url, paramJson);
 		CloseableHttpClient httpClient = null;
 		CloseableHttpResponse httpResponse = null;
 		String result = "";
@@ -93,16 +93,18 @@ public class HttpHelper {
 		// 创建httpPost远程连接实例
 		HttpPost httpPost = new HttpPost(url);
 		// 配置请求参数实例
-		RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(35000)// 设置连接主机服务超时时间
-				.setConnectionRequestTimeout(35000)// 设置连接请求超时时间
-				.setSocketTimeout(60000)// 设置读取数据连接超时时间
-				.build();
-		// 为httpPost实例设置配置
-		httpPost.setConfig(requestConfig);
+		// RequestConfig requestConfig =
+		// RequestConfig.custom().setConnectTimeout(35000)// 设置连接主机服务超时时间
+		// .setConnectionRequestTimeout(35000)// 设置连接请求超时时间
+		// .setSocketTimeout(60000)// 设置读取数据连接超时时间
+		// .build();
+		// // 为httpPost实例设置配置
+		// httpPost.setConfig(requestConfig);
 		// 设置请求头
-		httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
+		httpPost.setHeader("Content-Type", "application/json");
 		// 封装post请求参数
 		if (null != paramMap && paramMap.size() > 0) {
+			log.debug("null != paramMap && paramMap.size() > 0");
 			List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 			// 通过map集成entrySet方法获取entity
 			Set<Entry<String, Object>> entrySet = paramMap.entrySet();
@@ -110,43 +112,26 @@ public class HttpHelper {
 			Iterator<Entry<String, Object>> iterator = entrySet.iterator();
 			while (iterator.hasNext()) {
 				Entry<String, Object> mapEntry = iterator.next();
+				log.debug("{}:{}", mapEntry.getKey(), mapEntry.getValue().toString());
 				nvps.add(new BasicNameValuePair(mapEntry.getKey(), mapEntry.getValue().toString()));
 			}
 
 			// 为httpPost设置封装好的请求参数
-			try {
-				httpPost.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
-			} catch (UnsupportedEncodingException e) {
-				log.error(e.toString());
-			}
+			httpPost.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
 		}
-		try {
-			// httpClient对象执行post请求,并返回响应参数对象
-			httpResponse = httpClient.execute(httpPost);
-			// 从响应对象中获取响应内容
-			HttpEntity entity = httpResponse.getEntity();
-			result = EntityUtils.toString(entity);
-		} catch (ClientProtocolException e) {
-			log.error(e.toString());
-		} catch (IOException e) {
-			log.error(e.toString());
-		} finally {
-			// 关闭资源
-			if (null != httpResponse) {
-				try {
-					httpResponse.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			if (null != httpClient) {
-				try {
-					httpClient.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+		// paramJson = "{\"token\": \"d5953f57-d811-4f36-bcb7-f8bf0ad46a72\",\"date\":
+		// \"2018-01-19\",\"metrics\": [\"pe_ttm\",\"market_value\"]}";
+		httpPost.setEntity(new StringEntity(paramJson));
+
+		// httpClient对象执行post请求,并返回响应参数对象
+		httpResponse = httpClient.execute(httpPost);
+		log.debug(httpResponse.getStatusLine().toString());
+		// 从响应对象中获取响应内容
+		HttpEntity entity = httpResponse.getEntity();
+		result = EntityUtils.toString(entity);
+
+		httpResponse.close();
+		httpClient.close();
 		log.debug("result:" + result);
 		return result;
 	}
