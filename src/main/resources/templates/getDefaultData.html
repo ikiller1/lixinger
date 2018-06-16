@@ -9,7 +9,6 @@
 <body>
     <h1>testThymeleaf</h1>
     <h1 th:text="${user}">Hello, Spring Boot!</h1>
-    <button type="button" class="btn btn-primary">（首选项）Primary</button>
-    <a href= "getdefaultData">123</a>
+    <p th:each="item : ${items}" th:text="${item.stockCnName}"></p>
 </body>
 </html>

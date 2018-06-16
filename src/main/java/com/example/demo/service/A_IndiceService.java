@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.example.demo.bean.Metrics;
 import com.example.demo.bean.RequestParam;
+import com.example.demo.bean.ResponseItem;
 import com.example.demo.util.HttpHelper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -38,19 +40,27 @@ public class A_IndiceService {
 		return token;
 	}
 
-	public String getDefaultData() throws Exception {
+	public List<ResponseItem> getDefaultData() throws Exception {
 		log.debug("getDefaultData()");
 		RequestParam param = new RequestParam();
 		param.setToken(token);
+
 		List<String> metrics = new ArrayList<>();
 		metrics.add(Metrics.PE_TTM);
 		param.setMetrics(metrics);
 
+		List<String> stockCodes = new ArrayList<>();
+		stockCodes.add("000009");
+		param.setStockCodes(stockCodes);
+
 		String map = mapper.writeValueAsString(param);
 		log.debug(map);
 		String result = HttpHelper.doPost(url, null, map);
-		log.debug("result:" + result);
-		return result;
+//		log.debug("result:" + result);
+		List<ResponseItem> items = mapper.readValue(result, new TypeReference<List<ResponseItem>>() {
+		});
+		log.debug("again:" + mapper.writeValueAsString(items));
+		return items;
 
 	}
 }
